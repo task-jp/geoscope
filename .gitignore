@@ -1,5 +1,6 @@
 .env
 .worker_key
+docker-compose.override.yml
 models/
 datasets/
 tiles/

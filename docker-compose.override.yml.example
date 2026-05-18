@@ -1,0 +1,25 @@
+# docker-compose の追加設定例。
+#
+# 使い方:
+#   1. このファイルを `docker-compose.override.yml` にコピー
+#   2. 必要な部分だけ残して編集
+#   3. `docker compose up -d` すると compose が自動でマージしてくれる
+#
+# このファイル自体は .gitignore されているので、各 deployment ごとに独自値を
+# 入れて使ってください。
+#
+# 想定ユースケース:
+# - 大量の高ズーム (z=16) タイルを別ディスク (block storage 等) に置いている
+# - 本番ドメイン / OAuth リダイレクト URL を上書きしたい
+# - 開発用に追加のポート公開や別ボリュームを足したい
+
+services:
+  backend:
+    volumes:
+      # z=16 (約168GB) を別ディスクに分けて mount したい場合の例
+      - /mnt/big-disk/z16:/data/tiles/16:ro
+    environment:
+      # docker-compose.yml の default 値を上書きする例
+      # OAUTH_REDIRECT_BASE: https://your-domain.example.com
+      # GEOSCOPE_SERVER: https://your-domain.example.com
+      # DEM_TILE_BASE_URL: https://your-r2-public-bucket.example.com
