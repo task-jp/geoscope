@@ -3120,7 +3120,7 @@ function updateLabelFilter() {
     });
 
     const btm = document.createElement('div'); btm.className = 'filter-row';
-    if (S.filterConfig.sets.length < 2) {
+    if (S.filterConfig.sets.length < 2 && S.filterConfig.sets[0].rows.length > 0) {
       const addS = document.createElement('button'); addS.className = 'filter-add';
       addS.textContent = '+ \u7a7a\u9593\u6bd4\u8f03';
       addS.style.cssText = 'color:#c084fc;border-color:#7c3aed;margin-left:auto;';
