@@ -30,8 +30,10 @@ jobs:
       - name: Smoke-import FastAPI app
         run: |
           cd backend
-          # Stub minimal env so Settings doesn't fail.
-          DATABASE_URL=sqlite+aiosqlite:///:memory: \
+          # Stub env so Settings + create_async_engine don't fail.
+          # asyncpg is in requirements.txt, so the engine builds lazily without
+          # an actual connection (no aiosqlite needed).
+          DATABASE_URL=postgresql+asyncpg://stub:stub@localhost:5432/stub \
           VALKEY_URL=redis://localhost:6379/0 \
           SECRET_KEY=ci-only-stub-key-1234567890 \
           python -c "from app.main import app; print('imported:', app.title)"
