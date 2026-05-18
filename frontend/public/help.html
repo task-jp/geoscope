@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>GeoScope はじめてガイド</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="GeoScope の使い方。赤色立体地図で地形を眺めて、気になる場所を ⭕❌ で印を付けて、AI に学習させて全国スキャン。">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif;
+    background: #0a0e1a;
+    color: #e0e0e0;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+  a { color: #6bcfff; }
+  .container { max-width: 760px; margin: 0 auto; padding: 24px; }
+
+  header.top {
+    padding: 60px 24px 40px;
+    background: linear-gradient(135deg, #1a0f1f 0%, #0a0e1a 50%, #0f1a2a 100%);
+    text-align: center;
+  }
+  header.top h1 {
+    font-size: clamp(1.8em, 5vw, 2.8em);
+    margin: 0 0 12px;
+    background: linear-gradient(90deg, #ff6b6b, #6bcfff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  header.top p { color: #c0c0c0; margin: 0; }
+
+  .chapter {
+    background: #131825;
+    border: 1px solid #2a2a4a;
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+  }
+  .chapter h2 {
+    color: #6bcfff;
+    margin: 0 0 8px;
+    font-size: 1.3em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chapter .step-num {
+    background: #6bcfff;
+    color: #0a0e1a;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85em;
+    font-weight: 700;
+  }
+  .chapter h3 { color: #fff; margin: 20px 0 8px; font-size: 1.05em; }
+  .chapter p { color: #c0c0c0; margin: 0 0 12px; }
+  .chapter ul, .chapter ol { color: #c0c0c0; }
+  .chapter li { margin: 4px 0; }
+  .chapter code {
+    background: #0d1117;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.9em;
+    color: #6bcfff;
+  }
+
+  .callout {
+    background: #1a0f1f;
+    border-left: 3px solid #ff6b6b;
+    padding: 12px 16px;
+    margin: 16px 0;
+    border-radius: 4px;
+    color: #e0c0c0;
+    font-size: 0.95em;
+  }
+  .callout.tip {
+    background: #0f1a2a;
+    border-left-color: #6bcfff;
+    color: #c0d4e0;
+  }
+  .callout.fun {
+    background: #1a1a0f;
+    border-left-color: #ffd700;
+    color: #e0e0c0;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    background: linear-gradient(90deg, #ff6b6b, #ff8c66);
+    color: #fff;
+  }
+
+  details {
+    margin: 12px 0;
+    padding: 12px 16px;
+    background: #0f1218;
+    border-radius: 6px;
+    border: 1px solid #2a2a4a;
+  }
+  details summary {
+    cursor: pointer;
+    color: #6bcfff;
+    font-weight: 500;
+  }
+  details[open] summary { margin-bottom: 8px; }
+  details p { margin: 8px 0 0; color: #c0c0c0; font-size: 0.95em; }
+
+  footer {
+    margin-top: 60px;
+    padding: 40px 24px;
+    text-align: center;
+    background: #06080f;
+    color: #888;
+    font-size: 0.9em;
+  }
+  footer a { color: #888; margin: 0 8px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="container" style="padding: 0;">
+    <div style="display:inline-block;padding:3px 10px;margin-bottom:10px;background:#ff6b6b22;border:1px solid #ff6b6b66;border-radius:20px;color:#ff9999;font-size:0.8em;">🚧 Alpha リリース</div>
+    <h1>❓ ヘルプ</h1>
+    <p>機能リファレンス + 経験則。基本操作を知りたい方は先に <a href="/tutorial.html" style="color:#6bcfff;">🔰 はじめてガイド</a> をどうぞ。</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="chapter">
+    <h2>🛠️ もっと使いこなす</h2>
+    <p>機能が多いので、目的別に詳しく:</p>
+
+    <h3>🗺️ マップ操作</h3>
+    <ul>
+      <li><strong>3 レイヤー</strong>: 🩻 赤色立体地図 / 🗾 航空写真 / 🗺️ ベースマップ。各レイヤーは ON/OFF + 透過度スライダ</li>
+      <li><strong>立体化スライダ</strong>: 標高の誇張倍率 (0〜2)。地形のうねりを際立たせる</li>
+      <li><strong>ヘッダの quick toggle</strong>: 🩻🗾🗺️⛰️ アイコンで素早く切替</li>
+      <li><strong>3D 視点</strong>: 右クリックドラッグで回転・傾き、Shift+ドラッグで pitch</li>
+      <li><strong>URL の永続化</strong>: 開いている場所が <code>/@z/lat/lon/bearing/pitch</code> の URL に随時反映。シェア可能</li>
+    </ul>
+
+    <h3>🏷️ ラベルとアノテーション</h3>
+    <ul>
+      <li><strong>⭕❌❓ 投票</strong>: 「合ってる」「違う」「保留」を 1 アノテーションに 1 つ。AI 学習のラベルになる (⭕ が正例、❌ が負例)</li>
+      <li><strong>カスタムラベル + 絵文字</strong>: ヘッダの 🏷️ ボタンでラベルを追加・編集 (例: 「⭐確定」「📍 現地確認済み」)</li>
+      <li><strong>選択 → 詳細パネル</strong>: 1 件選ぶと右下にメモ・座標・ラベル一覧が出る</li>
+      <li><strong>system ラベル</strong>: <code>scan</code> (探索結果) と <code>import</code> (インポート) は削除できない (孤立アノテーション防止)</li>
+    </ul>
+
+    <h3>🔍 フィルタ (複数セット + 空間結合)</h3>
+    <p>サイドバーの「フィルタ」で複雑な条件絞り込みが可能:</p>
+    <ul>
+      <li><strong>1 セット内</strong>: ラベル有無 + 投票 + 都道府県 + 名前 (部分一致/未設定) を AND 結合</li>
+      <li><strong>セット間</strong>: AND / OR / disjoint (空間的に重ならない)。<code>ST_Intersects</code> で PostGIS が処理</li>
+      <li><strong>件数制限</strong>: 各セットに上限を設定可能</li>
+      <li><strong>「適用」ボタン</strong>を押すまで API は呼ばない (条件を組み立てる時のレンダー負荷ゼロ)</li>
+    </ul>
+    <div class="callout tip">
+      💡 例: 「⭐確定 ラベル」かつ「奈良県」のものから 100 件選ぶ → これを ⭕ で再学習させて精度を上げる、という運用が王道。
+    </div>
+
+    <h3>🖼️ ギャラリーモード</h3>
+    <ul>
+      <li>右上の 🖼 ボタンで切替。フィルタした検出結果を <strong>画像グリッド</strong> で一括レビュー</li>
+      <li>背景レイヤー (基本地図 / 航空写真 / 赤色立体地図) を切り替えながら判定可能</li>
+      <li>👍 / 👎 で 1 件ずつ承認/却下、一括選択して投票やラベル付与もできる</li>
+      <li>サムネは CDN タイル + CSS クロップで生成 (バックエンド負荷 0)</li>
+    </ul>
+
+    <h3>📥 インポート / 📤 エクスポート</h3>
+    <ul>
+      <li><strong>GeoJSON インポート</strong>: Point または Polygon。Point は緯度経度から bbox を自動推定 (タイル内分数位置)</li>
+      <li><strong>CSV インポート</strong>: lat,lon ベース。1 列で名前 (label) を持てる</li>
+      <li><strong>GeoJSON エクスポート</strong>: 2 形式 (bbox / point)。QGIS や Google My Maps で開ける</li>
+      <li><strong>uMap 用 GeoJSON</strong>: 名前 + ラベル + GeoScope へのリンク付き、uMap にそのまま貼れる</li>
+      <li><strong>Google Sheets CSV</strong>: サムネ URL 付き、Sheets で <code>=IMAGE()</code> でプレビューできる</li>
+      <li>インポートで作られたアノテーションには「📤 YYYY/MM/DD HH:MM:SS インポート」ラベルが自動付与 (後で一括削除可能)</li>
+    </ul>
+
+    <h3>⚙️ 探索モードの選び方</h3>
+    <p>アカウント設定 → 🚀 探索GPU で 3 つから選択:</p>
+    <table style="width:100%;font-size:0.95em;border-collapse:collapse;margin:8px 0;">
+      <tr style="border-bottom:1px solid #2a2a4a;color:#6bcfff;text-align:left;">
+        <th style="padding:6px 4px;">モード</th>
+        <th style="padding:6px 4px;">GPU</th>
+        <th style="padding:6px 4px;">1 回</th>
+        <th style="padding:6px 4px;">特徴</th>
+      </tr>
+      <tr style="border-bottom:1px solid #2a2a4a;">
+        <td style="padding:6px 4px;">🐌 節約</td><td style="padding:6px 4px;">Community 4090</td><td style="padding:6px 4px;">500〜700円</td>
+        <td style="padding:6px 4px;">最安、ただし在庫切れ時は永久リトライで時間かかる</td>
+      </tr>
+      <tr style="border-bottom:1px solid #2a2a4a;">
+        <td style="padding:6px 4px;">⚖️ 標準</td><td style="padding:6px 4px;">Secure 4090</td><td style="padding:6px 4px;">約 800円</td>
+        <td style="padding:6px 4px;">在庫安定、ほぼ即起動。default 推奨</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 4px;">⚡ 急ぎ</td><td style="padding:6px 4px;">Secure + H100 等</td><td style="padding:6px 4px;">800〜1500円</td>
+        <td style="padding:6px 4px;">最速、短納期や急ぎの実証で</td>
+      </tr>
+    </table>
+
+    <h3>💻 ローカル GPU セットアップ詳細</h3>
+    <p>RTX 4090 などを持っているなら、自宅マシンで worker を動かせます (運用コスト 0 円、電気代のみ):</p>
+    <ol>
+      <li>アカウント設定 → 🚀 探索GPU → 💻 ローカル GPU 選択</li>
+      <li>(任意) ☑️ 自動再起動 / ☑️ DEM キャッシュ保存 を選ぶ</li>
+      <li>表示された <code>docker run</code> コマンドをコピー → 自宅 PC で実行</li>
+      <li>必要なホスト側ソフト: NVIDIA GPU ドライバ / Docker / nvidia-container-toolkit</li>
+      <li>ブラウザの「探索」ボタンを押すと、自宅 worker が polling で claim → 処理</li>
+    </ol>
+    <div class="callout tip">
+      💡 複数台に同じ <code>WORKER_API_KEY</code> を設定すると、スキャンのタイルが分担されて並列処理されます (学習自体は 1 台、その後のスキャン段階で並列化)。フェイルオーバーにもなります。
+    </div>
+
+    <h3>📍 名前付与 (Google Places)</h3>
+    <ul>
+      <li>アカウント設定 → ⚙️ その他 → <strong>Google API Key</strong> を入れる (任意)</li>
+      <li>検出結果のフィルタを適用 → ギャラリーで 📍 Google ボタン</li>
+      <li>各検出地点から半径 100m 以内の最寄り Place 名 (神社・古墳・遺跡等) を距離順に取得し、ラベルとして付与</li>
+      <li>行政区域 (○○市 等) は除外</li>
+      <li><strong>キーワード絞り込み</strong> (経験則): 古墳系を対象にしているなら「<strong>墳</strong>」、城址/城跡を対象にしているなら「<strong>城</strong>」をキーワードに入れると、関係ない Place 名で汚染されず精度が高まる</li>
+      <li>Google API はキー保有者に課金。Places API の <strong>$200/月の無料枠</strong> がある</li>
+    </ul>
+
+    <h3>🛰️ Mapbox 衛星画像 (オプション)</h3>
+    <ul>
+      <li>デフォルトは <strong>国土地理院の航空写真</strong> (無料・無制限)</li>
+      <li>より高解像度な衛星画像が必要なら、自分の <strong>Mapbox トークン</strong> を入れることで Mapbox Satellite に切替</li>
+      <li>Mapbox はトークン保有者に課金 (月 50,000 リクエストまで無料)</li>
+    </ul>
+
+    <h3>🔄 中断と再開</h3>
+    <ul>
+      <li>探索ジョブは backend が管理。ブラウザ閉じても処理は進む</li>
+      <li>worker や Pod がクラッシュしても、最後の保存ポイント (10,000 タイルごと) から自動再開</li>
+      <li>RunPod 側で Pod を手動停止した場合は、次回「探索」を押せば新 Pod が起動して続きから</li>
+    </ul>
+
+    <h3>🧹 結果の整理ワークフロー</h3>
+    <ol>
+      <li>探索完了 → scan の一時ラベル付きアノテーションが多数追加される</li>
+      <li>ギャラリーモード 🖼 で 1 件ずつ 👍/👎 投票</li>
+      <li>フィルタで <code>annotation_vote=yes</code> + その scan の一時ラベルを絞り込む</li>
+      <li>本物に <strong>永続ラベル (例: 「前方後円墳」)</strong> を一括追加付与</li>
+      <li>scan の一時ラベルを一括削除 → 本体は永続ラベル付きで残る</li>
+      <li>再学習ボタン (🎯 再スコア) または 再探索で精度を上げる、これを繰り返す</li>
+    </ol>
+  </div>
+
+  <div class="chapter">
+    <h2>💡 ベストプラクティス (経験則)</h2>
+    <p>
+      AI の精度を上げるためのノウハウ。これに従うとモデルがすぐに賢くなります。
+    </p>
+
+    <h3>⭕❌❓ の使い分け</h3>
+    <ul>
+      <li><strong>⭕ (正例)</strong>: <strong>確実に教師データになるもの</strong>。「これは間違いなく対象 (例: 前方後円墳)」と断言できる地物だけに付ける</li>
+      <li><strong>❌ (負例)</strong>: <strong>明らかに間違いなもの</strong>。「これは似てるけど絶対違う」という典型例を集めると、AI が混同しなくなる</li>
+      <li><strong>❓ (保留)</strong>: <strong>教師データにしないもの</strong>。既知の偽陽性、判断が割れる微妙なもの、要再調査のもの。学習からは無視される</li>
+    </ul>
+    <div class="callout tip">
+      💡 「悩むものを ⭕ に入れない」のが鉄則。確度の低い ⭕ を増やすと AI の判断軸がぼやけます。
+    </div>
+
+    <h3>ラベルは 1 つ (以上) を永続運用 — 探索ごとに作らない</h3>
+    <p>
+      よくある誤解: 「探索ごとに新しいラベル」ではありません。
+      正しい運用は <strong>「前方後円墳」など 1 つの永続ラベル</strong> を用意し、
+      <strong>何回も探索を回しながら</strong>、その都度の検出結果の中から見つかった本物を
+      そのラベルに追加していく、というやり方です。⭕❌ を調整しながら何サイクルも回して
+      「前方後円墳」ラベルを育てていきます。
+    </p>
+    <p>サイクル全体像:</p>
+    <ol>
+      <li>「前方後円墳」というラベルを 1 つ作る (絵文字: ⛩️ 等)</li>
+      <li>探索を実行 → 検出結果には <strong>scan の一時ラベル</strong> (例: <code>2026/05/15 12:00 全国</code>) が付く</li>
+      <li>ギャラリーモードで結果をレビューし、本物 (⭕) に「前方後円墳」ラベルを追加付与</li>
+      <li>明らかに違うものには ❌、微妙なものには ❓</li>
+      <li>整理後、scan の一時ラベルは一括削除して OK (本体は「前方後円墳」ラベルに紐付き済み)</li>
+      <li>再学習・再探索 → 前方後円墳ラベル内の ⭕ がさらに増える</li>
+      <li>3〜4 サイクル繰り返すと精度が大幅向上 (経験則)</li>
+    </ol>
+
+    <h3>「前方後円墳」ラベル内の ⭕ 割合を管理</h3>
+    <p>
+      永続ラベル (例: 「前方後円墳」) の中の <strong>⭕ 割合</strong> がモデル品質の指標になります:
+    </p>
+    <ul>
+      <li>⭕ 割合 <strong>50〜60% が目安</strong></li>
+      <li><strong>多すぎる (&gt; 60%)</strong>: 教師過剰 → 同じものしか拾わなくなり、新しいものを見逃す。⭕ を間引くか ❌ を増やす</li>
+      <li><strong>少なすぎる (&lt; 50%)</strong>: 教師不足 / 偽陽性多すぎ → ⭕ を増やすか bbox を絞る</li>
+    </ul>
+
+    <h3>始め方: 手動 50〜100 個 → 探索で増やすループ</h3>
+    <ol>
+      <li><strong>最初に手動で 50〜100 個</strong> の既知アノテーションを ⭕ で作成し、永続ラベル (例:「前方後円墳」) を付与</li>
+      <li>「探索」実行 → 結果が出る</li>
+      <li>結果から本物を選別、⭕ + 「前方後円墳」ラベル追加付与。違うものに ❌、微妙なものに ❓</li>
+      <li>scan の一時ラベルは整理後にまとめて削除 (永続ラベル付きの本体は残る)</li>
+      <li>再学習・再探索を繰り返してラベルを充実させる</li>
+    </ol>
+    <div class="callout fun">
+      🎯 最初の手動 50 個が一番大事。ここで質の高い ⭕ を集めると、その後がぐっと楽になります。
+    </div>
+
+    <h3>バウンディングボックスは「対象に対して」一貫した囲み方を</h3>
+    <ul>
+      <li>bbox は <strong>対象の輪郭ギリギリ</strong> がベスト。広く取りすぎると周辺の地形まで学習対象になってしまう</li>
+      <li>大事なのは <strong>「対象物に対する bbox の囲み方」が揃っていること</strong>。例えば前方後円墳ならどの大きさのものでも「外周をぴったり、周濠は含めない」など、ルールを統一する</li>
+      <li>(対象物そのもののサイズは大小ばらつくのが当然なので、絶対サイズを揃えるという意味ではない)</li>
+      <li>定期的に <strong>⭕ の見直しと bbox の調整</strong> を推奨。古い ⭕ で「囲み方の揺れ」が大きいものを直すだけで精度が体感できるほど上がる</li>
+    </ul>
+    <div class="callout tip">
+      💡 「再学習前に古い ⭕ の bbox 囲み方を統一する」を習慣にすると、サイクルが進むほど精度が安定して伸びる。
+    </div>
+  </div>
+
+  <div class="chapter">
+    <h2>❓ よくある質問</h2>
+
+    <details>
+      <summary>RunPod 課金が怖いです。安全策は?</summary>
+      <p>RunPod ダッシュボードで「Spending Limit」を月額 $20 などに設定できます。GeoScope 側からは料金を発生させる操作 (Pod 起動) しかしないので、上限を設けておけば暴走しません。</p>
+    </details>
+
+    <details>
+      <summary>1日中ブラウザを開いておかないとダメ?</summary>
+      <p>不要です。探索ジョブは backend が管理しているので、ブラウザを閉じても進みます。結果は次回ログイン時に表示されます。</p>
+    </details>
+
+    <details>
+      <summary>他人のプロジェクトは見える?</summary>
+      <p>見えません。プロジェクト・アノテーション・検出結果はすべて作成者本人にのみ表示されます。AI 学習もユーザー単位で完全に独立しています。</p>
+    </details>
+
+    <details>
+      <summary>アカウントを削除したい</summary>
+      <p>右上のアバター → アカウント設定 → 「アカウント削除」。プロジェクト・アノテーション・検出結果はすべて即時削除されます (復旧不可)。</p>
+    </details>
+
+    <details>
+      <summary>地図 URL をシェアできる?</summary>
+      <p><code>/@z/lat/lon/bearing/pitch</code> の URL は誰でも閲覧できます (OG メタタグ付き)。Twitter や Discord に貼ると地図の位置と方角がそのまま再現されます。</p>
+    </details>
+
+    <details>
+      <summary>探索を早く終わらせたい。複数の GPU を並列で使えない?</summary>
+      <p>現状は 1 ユーザー = 1 GPU で固定です (RunPod 在庫を抑える設計)。早く終わらせたい場合の代替策:</p>
+      <ul>
+        <li>「⚡ 急ぎモード」で H100 等の高性能 GPU を選ぶ → スキャン時間 1/2 程度</li>
+        <li>自分のローカル GPU と RunPod を <strong>同時に</strong> 動かす (両方に同じワーカー API キーを設定するとスキャン段階でタイルが分担される)</li>
+        <li>探索範囲を都道府県等で絞る → タイル数が全国の数% で済む</li>
+      </ul>
+      <p>「同一ユーザーが複数 RunPod GPU を並列で動かす」設定 UI は今後の検討項目です。</p>
+    </details>
+
+    <details>
+      <summary>もっと深く知りたい (技術的な仕組み)</summary>
+      <p>ソースコードは <a href="https://github.com/task-jp/geoscope-worker" target="_blank">geoscope-worker (AGPL-3.0)</a> で公開しています。150% 拡張タイルやマルチクラス学習の工夫は README とソースに書かれています。</p>
+    </details>
+  </div>
+
+  <div style="text-align: center; padding: 32px 0;">
+    <a href="/" class="btn">マップを開く →</a>
+  </div>
+
+</div>
+
+<footer>
+  <div>
+    <a href="/">GeoScope</a> ·
+    <a href="/landing.html">サービス紹介</a> ·
+    <a href="/terms.html">利用規約</a> ·
+    <a href="/privacy.html">プライバシー</a> ·
+    <a href="https://github.com/task-jp/geoscope/issues" target="_blank">問い合わせ</a>
+  </div>
+</footer>
+
+</body>
+</html>

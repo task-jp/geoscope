@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>GeoScope はじめてガイド (チュートリアル)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="GeoScope の初心者向けチュートリアル。地図を眺める → アノテーション → 探索 までの 6 ステップ。">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif;
+    background: #0a0e1a;
+    color: #e0e0e0;
+    line-height: 1.8;
+    min-height: 100vh;
+  }
+  a { color: #6bcfff; }
+  .container { max-width: 760px; margin: 0 auto; padding: 24px; }
+
+  header.top {
+    padding: 60px 24px 40px;
+    background: linear-gradient(135deg, #1a0f1f 0%, #0a0e1a 50%, #0f1a2a 100%);
+    text-align: center;
+  }
+  header.top h1 {
+    font-size: clamp(1.8em, 5vw, 2.8em);
+    margin: 0 0 12px;
+    background: linear-gradient(90deg, #ff6b6b, #6bcfff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  header.top p { color: #c0c0c0; margin: 0; }
+
+  .chapter {
+    background: #131825;
+    border: 1px solid #2a2a4a;
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+  }
+  .chapter h2 {
+    color: #6bcfff;
+    margin: 0 0 8px;
+    font-size: 1.3em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .chapter .step-num {
+    background: #6bcfff;
+    color: #0a0e1a;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85em;
+    font-weight: 700;
+  }
+  .chapter h3 { color: #fff; margin: 20px 0 8px; font-size: 1.05em; }
+  .chapter p { color: #c0c0c0; margin: 0 0 12px; }
+  .chapter ul, .chapter ol { color: #c0c0c0; }
+  .chapter li { margin: 4px 0; }
+  .chapter code {
+    background: #0d1117;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.9em;
+    color: #6bcfff;
+  }
+
+  .callout {
+    background: #1a0f1f;
+    border-left: 3px solid #ff6b6b;
+    padding: 12px 16px;
+    margin: 16px 0;
+    border-radius: 4px;
+    color: #e0c0c0;
+    font-size: 0.95em;
+  }
+  .callout.tip {
+    background: #0f1a2a;
+    border-left-color: #6bcfff;
+    color: #c0d4e0;
+  }
+  .callout.fun {
+    background: #1a1a0f;
+    border-left-color: #ffd700;
+    color: #e0e0c0;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    background: linear-gradient(90deg, #ff6b6b, #ff8c66);
+    color: #fff;
+  }
+  .btn-outline { background: transparent; border: 2px solid #6bcfff; color: #6bcfff; }
+
+  footer {
+    margin-top: 60px;
+    padding: 40px 24px;
+    text-align: center;
+    background: #06080f;
+    color: #888;
+    font-size: 0.9em;
+  }
+  footer a { color: #888; margin: 0 8px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="container" style="padding: 0;">
+    <div style="display:inline-block;padding:3px 10px;margin-bottom:10px;background:#ff6b6b22;border:1px solid #ff6b6b66;border-radius:20px;color:#ff9999;font-size:0.8em;">🚧 Alpha リリース</div>
+    <h1>🔰 はじめてガイド</h1>
+    <p>赤色立体地図 + AI で「あなたの目で気になった地形」を全国から探し出す、20分の入門ツアー。</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="chapter">
+    <h2>🧐 GeoScope って何ができる?</h2>
+    <p>
+      日本全国の <strong>地形を 5m メッシュの精度</strong> で見て、人工地形 (古墳・城跡・古戦場・隠れ里・棚田・採掘跡など) を <strong>AI に学習させて自動で探す</strong> ツールです。
+    </p>
+    <p>あなたがやることはシンプル:</p>
+    <ul>
+      <li>気になる場所を <strong>⭕</strong> や <strong>❌</strong> で印を付ける (アノテーション)</li>
+      <li>「探索」ボタンを押す</li>
+      <li>AI があなたの ⭕ を真似て全国 100万タイルをスキャン</li>
+      <li>怪しい地形を地図上にリスト化</li>
+    </ul>
+    <div class="callout fun">
+      ✨ 1人の趣味で「全国の古墳候補を AI に探させる」が現実になっちゃう時代です。
+    </div>
+  </div>
+
+  <div class="chapter">
+    <h2><span class="step-num">1</span> まず地図を眺める</h2>
+    <p>ログインしたら、まず <strong>赤色立体地図 (RRIM)</strong> を有効にして近所を眺めてみましょう。サイドバー左の「🩻 赤色立体地図」のチェックを ON。</p>
+    <h3>赤色立体地図ってなに?</h3>
+    <p>標高データを「立体感」がくっきり見えるよう色付けした地図です。航空写真では木に隠れて見えない <strong>微地形</strong> (古墳の盛り土、城跡の堀、棚田の段差) が、影絵のように浮かび上がります。</p>
+    <div class="callout tip">
+      💡 まずは奈良県 (橿原・桜井あたり) や 千葉県 (印旛沼周辺) を z=16 で眺めると、有名な古墳群がボコボコ見えて感動します。
+    </div>
+  </div>
+
+  <div class="chapter">
+    <h2><span class="step-num">2</span> プロジェクトを作る</h2>
+    <p>「何を探したいか」をプロジェクトとして分けます。</p>
+    <ul>
+      <li><strong>古墳プロジェクト</strong>: 円墳・前方後円墳など、ぽっこりした人工地形</li>
+      <li><strong>城跡プロジェクト</strong>: 山城の堀切・曲輪・土塁などの直線的な人工地形</li>
+      <li><strong>ご当地プロジェクト</strong>: 例 「秩父の隠れ里」「茶畑の跡」など、何でもアリ</li>
+    </ul>
+    <p>ヘッダ上部のプロジェクトセレクタ横の「<strong>+</strong>」ボタンで作成。名前は後で変えられます。</p>
+  </div>
+
+  <div class="chapter">
+    <h2><span class="step-num">3</span> ⭕❌ で印を付ける (アノテーション)</h2>
+    <p>地図上で対象を囲むように <strong>ドラッグして bounding box を描く</strong> → <strong>⭕ (正例)</strong> または <strong>❌ (負例)</strong> を選択。</p>
+    <p>クリックではなくドラッグなのは、AI が「どこからどこまでが対象か」を学習するためにサイズ情報も必要だから。古墳や城跡の輪郭くらいの大きさで囲むのが目安です。</p>
+    <h3>コツ</h3>
+    <ul>
+      <li><strong>⭕ は 50〜100個</strong> 集めるところからスタート。少なすぎると AI が学習できません</li>
+      <li><strong>❌ も同じくらい</strong> 入れると賢くなる (「これは古墳に似てるけど違う」を教える)</li>
+      <li>多少間違っていても OK。量 &gt; 質 です</li>
+    </ul>
+    <div class="callout tip">
+      💡 ⭕❌❓ の使い分け、bbox の精度、ラベル運用などの詳細は <a href="/help.html">ヘルプ「ベストプラクティス」</a> へ。
+    </div>
+  </div>
+
+  <div class="chapter">
+    <h2><span class="step-num">4</span> 自分の GPU を繋ぐ (BYO RunPod)</h2>
+    <p>探索は AI の学習 + 全国スキャンで <strong>RTX 4090 を 6〜8時間</strong> 使うので、運営の GPU ではなく <strong>あなた自身の RunPod アカウント</strong> で実行します。</p>
+    <h3>セットアップ (1回だけ)</h3>
+    <ol>
+      <li><a href="https://runpod.io?ref=ok9s0q0q" target="_blank">招待リンク</a> から RunPod 登録 (非欧州ユーザーは登録ボーナス $0〜$10、多くは $5)</li>
+      <li>RunPod 画面で API key を発行</li>
+      <li>GeoScope の右上アバター → アカウント設定 → RunPod API Key 欄に貼って「検証」</li>
+    </ol>
+    <h3>料金 (探索モード別、RunPod に直接支払い)</h3>
+    <ul>
+      <li>🐌 <strong>節約</strong> (Community 4090): 約 500〜700円/scan、在庫切れ時は待ち</li>
+      <li>⚖️ <strong>標準</strong> (Secure 4090、推奨): <strong>約 800円/scan</strong></li>
+      <li>⚡ <strong>急ぎ</strong> (Secure + 高性能 GPU): 800〜1500円/scan</li>
+      <li>運営 (geoscope.jp) は手数料 0、紹介リワードだけ受け取り</li>
+    </ul>
+    <div class="callout tip">
+      💡 Pod は scan 完了後 idle 5分で自動削除。永続ストレージ無し設計なので <strong>アイドル料金 0 円</strong>。
+    </div>
+  </div>
+
+  <div class="chapter">
+    <h2><span class="step-num">5</span> 「探索」ボタンを押す</h2>
+    <p>サイドバーの「探索」を押すと、裏側で:</p>
+    <ol>
+      <li>あなたの RunPod Pod が起動 (~30秒〜2分)</li>
+      <li>DEM データを R2 から取得</li>
+      <li>あなたの ⭕❌ で YOLO26n を学習 (~10〜30分)</li>
+      <li>全国 100万タイルをスキャン (~6〜8時間)</li>
+      <li>怪しい地形を <strong>「探索結果」ラベル</strong> 付きで地図に表示</li>
+    </ol>
+    <p>WebSocket で進捗が流れてくるので、ブラウザ閉じても進みます。</p>
+    <div class="callout tip">
+      💡 「精度モード」を選べます。<strong>厳選 (0.5)</strong>: 数十件のみ高確度。<strong>推奨 (0.3)</strong>: バランス型。<strong>網羅 (0.2)</strong>: 数千件、後で絞り込む派向け。
+    </div>
+  </div>
+
+  <div class="chapter">
+    <h2><span class="step-num">6</span> 結果を眺めて選別する</h2>
+    <p>検出結果は <strong>ギャラリーモード</strong> 🖼 で一気に見られます (サイドバー右上)。</p>
+    <h3>使える操作</h3>
+    <ul>
+      <li>👍/👎 ボタン: 1件ずつ承認/却下</li>
+      <li>フィルタ: ラベル・都道府県・スコア閾値で絞り込み</li>
+      <li>一括操作: 選別済みのアノテーションをまとめて削除・ラベル付け</li>
+      <li>📥 エクスポート: GeoJSON / CSV で QGIS や Google My Maps にインポート可能</li>
+    </ul>
+    <div class="callout fun">
+      🏆 良かった検出に ⭕ を、明らかにダメな検出に ❌ を付けて再学習を回すと、モデルがどんどん賢くなる感覚は中毒性あり。
+    </div>
+  </div>
+
+  <div class="chapter" style="text-align: center;">
+    <h2 style="justify-content:center;">🎓 チュートリアル完了!</h2>
+    <p>これで基本操作は OK。さらに使いこなすには:</p>
+    <p>
+      <a href="/help.html" class="btn">❓ 機能リファレンス (ヘルプ) を読む</a>
+    </p>
+    <p style="margin-top:16px;">
+      <a href="/" class="btn btn-outline">マップを開く →</a>
+    </p>
+  </div>
+
+</div>
+
+<footer>
+  <div>
+    <a href="/">GeoScope</a> ·
+    <a href="/landing.html">サービス紹介</a> ·
+    <a href="/help.html">❓ ヘルプ</a> ·
+    <a href="/terms.html">利用規約</a> ·
+    <a href="/privacy.html">プライバシー</a> ·
+    <a href="https://github.com/task-jp/geoscope/issues" target="_blank">問い合わせ</a>
+  </div>
+</footer>
+
+</body>
+</html>

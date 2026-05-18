@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>GeoScope 管理</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif;
+    background: #0a0e1a;
+    color: #e0e0e0;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  a { color: #6bcfff; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  header h1 { margin: 0; font-size: 1.4em; color: #fff; }
+  header .nav a { margin-left: 12px; font-size: 0.9em; }
+
+  section { margin-bottom: 32px; }
+  section h2 { font-size: 1.1em; color: #6bcfff; border-bottom: 1px solid #2a2a4a; padding-bottom: 6px; margin-bottom: 12px; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+  .stat {
+    background: #131825;
+    border: 1px solid #2a2a4a;
+    border-radius: 8px;
+    padding: 12px 16px;
+  }
+  .stat .label { font-size: 11px; color: #888; }
+  .stat .value { font-size: 1.6em; font-weight: 600; color: #fff; margin-top: 2px; }
+  .stat .sub { font-size: 11px; color: #888; margin-top: 2px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #2a2a4a; }
+  th { color: #6bcfff; font-weight: 500; background: #0f1218; position: sticky; top: 0; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:hover { background: #131825; }
+  .avatar { width: 24px; height: 24px; border-radius: 50%; vertical-align: middle; margin-right: 6px; }
+  .badge { display: inline-block; padding: 1px 6px; border-radius: 10px; font-size: 10px; margin-left: 4px; }
+  .badge.admin { background: #6bcfff33; color: #6bcfff; }
+  .badge.google { background: #4285f433; color: #c0d4ff; }
+  .badge.line { background: #00c30033; color: #b8f1b8; }
+
+  .empty, .loading, .error {
+    padding: 24px;
+    text-align: center;
+    color: #888;
+    background: #131825;
+    border: 1px solid #2a2a4a;
+    border-radius: 8px;
+  }
+  .error { color: #ff8a8a; border-color: #5a2a2a; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>GeoScope 管理</h1>
+    <nav class="nav">
+      <a href="/">← マップへ戻る</a>
+    </nav>
+  </header>
+
+  <section>
+    <h2>統計</h2>
+    <div id="stats" class="loading">読み込み中...</div>
+  </section>
+
+  <section>
+    <h2>ユーザー一覧</h2>
+    <div id="users" class="loading">読み込み中...</div>
+    <div style="font-size:11px;color:#666;margin-top:8px;line-height:1.5;">
+      ※ GPU 時間/額は <code>jobs.completed_at - started_at</code> の合計から推定 (RTX 4090 Community $0.34/h)。
+      Pod 初回起動時の DEM 展開・ジョブ間 idle 時間は含まれず<strong>過小評価</strong>になります。
+      正確な額は各ユーザーが RunPod ダッシュボードで確認。
+    </div>
+  </section>
+</div>
+
+<script>
+const token = localStorage.getItem('token');
+if (!token) { location.replace('/landing.html'); }
+
+const authHeader = { 'Authorization': `Bearer ${token}` };
+
+function fmtDate(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function loadStats() {
+  const target = document.getElementById('stats');
+  try {
+    const res = await fetch('/api/admin/stats', { headers: authHeader });
+    if (res.status === 403) { target.className = 'error'; target.textContent = '管理者権限がありません'; return; }
+    if (res.status === 401) { location.replace('/landing.html'); return; }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const s = await res.json();
+
+    const jobsByStatus = Object.entries(s.jobs.by_status || {}).map(([k, v]) => k + ': ' + v).join(', ') || '—';
+    const jobsByType = Object.entries(s.jobs.by_type || {}).map(([k, v]) => k + ': ' + v).join(', ') || '—';
+
+    target.classList.remove('loading');
+    target.innerHTML = `
+      <div class="stat-grid">
+        <div class="stat">
+          <div class="label">ユーザー総数</div>
+          <div class="value">${s.users.total}</div>
+          <div class="sub">直近7日: +${s.users.new_7d} / 30日: +${s.users.new_30d}</div>
+        </div>
+        <div class="stat">
+          <div class="label">プロジェクト</div>
+          <div class="value">${s.projects.total}</div>
+        </div>
+        <div class="stat">
+          <div class="label">アノテーション</div>
+          <div class="value">${s.annotations.total.toLocaleString()}</div>
+        </div>
+        <div class="stat">
+          <div class="label">検出結果</div>
+          <div class="value">${s.detections.total.toLocaleString()}</div>
+        </div>
+        <div class="stat">
+          <div class="label">ジョブ総数</div>
+          <div class="value">${s.jobs.total}</div>
+          <div class="sub">直近7日: +${s.jobs.new_7d}</div>
+        </div>
+        <div class="stat" style="grid-column: span 2;">
+          <div class="label">ジョブ status 内訳</div>
+          <div class="sub" style="font-size:12px;color:#ccc;margin-top:4px;">${escapeHtml(jobsByStatus)}</div>
+          <div class="label" style="margin-top:8px;">ジョブ type 内訳</div>
+          <div class="sub" style="font-size:12px;color:#ccc;margin-top:4px;">${escapeHtml(jobsByType)}</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#666;margin-top:8px;">取得時刻: ${fmtDate(s.as_of)}</div>
+    `;
+  } catch (e) {
+    target.className = 'error';
+    target.textContent = '統計取得失敗: ' + e.message;
+  }
+}
+
+async function loadUsers() {
+  const target = document.getElementById('users');
+  try {
+    const res = await fetch('/api/admin/users', { headers: authHeader });
+    if (res.status === 403) { target.className = 'error'; target.textContent = '管理者権限がありません'; return; }
+    if (res.status === 401) { location.replace('/landing.html'); return; }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const users = await res.json();
+
+    if (users.length === 0) {
+      target.className = 'empty';
+      target.textContent = 'ユーザーがいません';
+      return;
+    }
+
+    target.classList.remove('loading');
+    target.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>ユーザー</th>
+            <th>プロバイダ</th>
+            <th>ToS</th>
+            <th class="num">プロジェクト</th>
+            <th class="num">アノテーション</th>
+            <th class="num">ジョブ</th>
+            <th class="num">GPU 時間 (推定)</th>
+            <th class="num">GPU 推定額 ($)</th>
+            <th>登録日</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${users.map(u => `
+            <tr>
+              <td>
+                ${u.avatar_url ? '<img class="avatar" src="' + escapeHtml(u.avatar_url) + '" alt="">' : ''}
+                ${escapeHtml(u.display_name || '(no name)')}
+                ${u.is_admin ? '<span class="badge admin">admin</span>' : ''}
+                <div style="font-size:11px;color:#888;">${escapeHtml(u.email || '')}</div>
+              </td>
+              <td><span class="badge ${escapeHtml(u.provider)}">${escapeHtml(u.provider)}</span></td>
+              <td>${u.tos_accepted_at ? '✓' : '—'}</td>
+              <td class="num">${u.projects}</td>
+              <td class="num">${u.annotations.toLocaleString()}</td>
+              <td class="num">${u.jobs}</td>
+              <td class="num">${u.gpu_hours_est.toFixed(1)} h</td>
+              <td class="num">$${u.gpu_cost_usd_est.toFixed(2)}</td>
+              <td style="font-size:11px;color:#aaa;">${fmtDate(u.created_at)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch (e) {
+    target.className = 'error';
+    target.textContent = 'ユーザー取得失敗: ' + e.message;
+  }
+}
+
+loadStats();
+loadUsers();
+</script>
+
+</body>
+</html>

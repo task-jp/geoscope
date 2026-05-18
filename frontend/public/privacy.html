@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>GeoScope プライバシーポリシー</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { max-width: 760px; margin: 2em auto; padding: 0 1em; font-family: -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif; line-height: 1.7; color: #333; }
+  h1 { border-bottom: 2px solid #2a6; padding-bottom: 0.3em; }
+  h2 { color: #2a6; margin-top: 2em; }
+  p, li { font-size: 14px; }
+  a { color: #2a6; }
+  hr { margin: 3em 0; border: 0; border-top: 1px solid #ddd; }
+  .meta { color: #888; font-size: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; margin: 1em 0; }
+  th, td { border: 1px solid #ddd; padding: 0.5em 0.8em; text-align: left; }
+  th { background: #f5f5f5; }
+</style>
+</head>
+<body>
+
+<h1>GeoScope プライバシーポリシー</h1>
+<p class="meta">最終更新: 2026年5月14日</p>
+
+<p>GeoScope (以下「本サービス」) は、利用者のプライバシーを尊重し、個人情報の保護に努めます。本ポリシーは、本サービスが取り扱う情報の種類と利用方法を定めるものです。</p>
+
+<h2>1. 収集する情報</h2>
+<table>
+  <tr><th>項目</th><th>取得方法</th><th>保存先</th></tr>
+  <tr><td>表示名・メールアドレス・アバター URL</td><td>Google OAuth 認証時</td><td>本サービス DB</td></tr>
+  <tr><td>OAuth プロバイダ識別子 (provider, provider_sub)</td><td>OAuth 認証時</td><td>本サービス DB</td></tr>
+  <tr><td>IP アドレス</td><td>HTTP リクエスト時</td><td>サーバーアクセスログ (短期保持)</td></tr>
+  <tr><td>利用規約への同意時刻</td><td>同意ボタン押下時</td><td>本サービス DB</td></tr>
+  <tr><td>アノテーション・プロジェクト・ジョブ履歴</td><td>利用者が作成</td><td>本サービス DB</td></tr>
+  <tr><td>RunPod API key</td><td>利用者がアカウント設定で入力</td><td><strong>ブラウザ localStorage のみ</strong> (サーバー側は探索リクエスト時に一時保管 → 完了時削除)</td></tr>
+</table>
+
+<h2>2. 利用目的</h2>
+<ul>
+  <li>本サービスの認証および利用者識別</li>
+  <li>探索ジョブの実行および結果の保存・表示</li>
+  <li>サービス改善のための統計分析 (個人を特定しない集計)</li>
+  <li>不正利用検知・運営上必要なやり取り</li>
+</ul>
+
+<h2>3. RunPod API key の取り扱い</h2>
+<p>BYO (Bring Your Own) クラウドGPU 設計に基づき、利用者の RunPod API key は以下のように扱います。</p>
+<ul>
+  <li><strong>ブラウザ localStorage に保存</strong>: 同じブラウザ・同じデバイスで本サービスを使う限り、利用者が明示的に消去するまで保存されます。</li>
+  <li><strong>HTTP ヘッダで送信</strong>: 探索リクエスト時にのみ <code>X-RunPod-Api-Key</code> ヘッダで本サービスのサーバーに送信されます。</li>
+  <li><strong>DB に永続化しない</strong>: サーバーはこのキーを Job レコードの一時フィールドに保存しますが、ジョブの完了・失敗・キャンセル時にデータベースから削除します。</li>
+  <li><strong>ログにマスク</strong>: アクセスログ・エラーレポートでは末尾数文字以外をマスク (Sentry 等のエラー追跡サービスを利用する場合)。</li>
+</ul>
+
+<h2>4. 第三者提供</h2>
+<p>本サービスは、以下を除き、利用者の個人情報を第三者に提供しません。</p>
+<ul>
+  <li>利用者の同意があった場合</li>
+  <li>法令に基づく開示請求があった場合</li>
+  <li>RunPod (利用者自身のキーによる API 呼び出し) — 利用者の指示に基づく Pod 起動リクエストのみ</li>
+  <li>Cloudflare (CDN・R2): IP アドレスの一部が転送経路で経由</li>
+</ul>
+
+<h2>5. Cookie / セッション</h2>
+<ul>
+  <li>本サービスは認証セッションを JWT (JSON Web Token) ベースで管理します。JWT は localStorage に保存され、API リクエストの Authorization ヘッダで送信されます。</li>
+  <li>本サービスはトラッキング目的の第三者 Cookie を使用しません。</li>
+</ul>
+
+<h2>6. データの保持期間</h2>
+<ul>
+  <li>利用者がアカウントを削除すると、関連するすべてのデータ (プロジェクト、アノテーション、ジョブ履歴、API key) は即座に削除されます。</li>
+  <li>サーバーアクセスログは原則として 30 日以内に削除します。</li>
+  <li>バックアップは最大 30 日保持され、その後完全に削除されます。</li>
+</ul>
+
+<h2>7. データ削除権</h2>
+<p>利用者は本サービスのアカウント設定画面の「アカウント削除」ボタンからいつでもアカウント削除を要求できます。削除は即時実行され、復旧はできません。</p>
+
+<h2>8. 外部サービス</h2>
+<p>本サービスは以下の外部サービスを利用しており、それぞれのプライバシーポリシーが適用されます。</p>
+<ul>
+  <li><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google</a> (OAuth)</li>
+  <li><a href="https://www.runpod.io/legal/privacy-policy" target="_blank" rel="noopener">RunPod</a> (利用者が自身のアカウントで利用)</li>
+  <li><a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">Cloudflare</a> (CDN, R2 ストレージ)</li>
+</ul>
+
+<h2>9. ポリシーの変更</h2>
+<p>本ポリシーは予告なく変更される場合があります。重要な変更がある場合は本サービス内で告知します。</p>
+
+<hr>
+<p class="meta">お問い合わせ: <a href="https://github.com/task-jp/geoscope/issues" target="_blank" rel="noopener">GitHub Issues</a></p>
+
+</body>
+</html>

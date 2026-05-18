@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GeoScope</title>
+<!-- OG: SNS の bot (JS なし) はこの index.html を取りに来るので、landing と同じ OG を載せる -->
+<meta name="description" content="赤色立体地図 + YOLO で、あなたが教えた地形を全国スキャン。古墳でも城跡でも自然地形でも、サンプルを与えるだけで AI が学習・検出します。">
+<meta property="og:title" content="GeoScope">
+<meta property="og:description" content="赤色立体地図 + YOLO で、あなたが定義した任意の地形を全国 AI 自動検出。BYO クラウドGPU 対応。">
+<meta property="og:type" content="website">
+<meta property="og:image" content="/favicon-512.png">
+<meta name="twitter:card" content="summary">
+<script>
+  // 未認証時はランディングページへリダイレクト (OAuth callback の ?token=... 時はスキップ)
+  (function() {
+    var hasToken = !!localStorage.getItem('token');
+    var inCallback = location.search.includes('token=');
+    var isMap = location.pathname.startsWith('/@');  // /@z/lat/lon の地図 URL は公開ページとして表示継続
+    if (!hasToken && !inCallback && !isMap) {
+      location.replace('/landing.html');
+    }
+  })();
+</script>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<script src="https://unpkg.com/maplibre-gl@5.23.0/dist/maplibre-gl.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.23.0/dist/maplibre-gl.css">
+<link rel="stylesheet" href="/style.css?v=97">
+</head>
+<body>
+<div id="app-root">
+
+<!-- Header -->
+<div id="header">
+  <button id="btn-menu" aria-label="メニュー">☰</button>
+  <h1><img src="/favicon.svg" alt="" style="height:18px;vertical-align:middle;margin-right:4px;">GeoScope <span style="font-size:9px;padding:1px 5px;background:#ff6b6b22;border:1px solid #ff6b6b66;border-radius:8px;color:#ff9999;font-weight:normal;vertical-align:middle;margin-left:4px;" title="Alpha リリース — ベータ・正式版に向けて改善中">α</span></h1>
+  <select id="project-select" class="auth-only" style="display:none;margin-left:8px;max-width:160px;background:#16213e;color:#e0e0e0;border:1px solid #2a2a4a;border-radius:4px;padding:2px 6px;font-size:12px;" disabled></select>
+  <button class="btn btn-sm auth-only" id="btn-new-project" style="display:none;font-size:11px;">+</button>
+  <button class="btn btn-sm btn-outline auth-only" id="btn-del-project" style="display:none;font-size:11px;color:#ff6b6b;" title="プロジェクト削除">🗑</button>
+  <button id="btn-labels" class="auth-only" style="display:none;background:none;border:1px solid #444;border-radius:4px;padding:2px 6px;cursor:pointer;font-size:14px;" title="ラベル管理">🏷️</button>
+  <div class="spacer"></div>
+  <a href="/tutorial.html" target="_blank" style="background:none;border:1px solid #444;border-radius:4px;padding:2px 8px;color:#e0e0e0;text-decoration:none;font-size:14px;margin-right:4px;" title="はじめてガイド">🔰</a>
+  <a href="/help.html" target="_blank" style="background:none;border:1px solid #444;border-radius:4px;padding:2px 8px;color:#e0e0e0;text-decoration:none;font-size:14px;margin-right:8px;" title="ヘルプ">❓</a>
+  <span id="user-info"></span>
+  <button id="btn-login">ログイン</button>
+</div>
+
+<!-- Sidebar overlay (mobile) -->
+<div id="sidebar-overlay"></div>
+
+<!-- Sidebar -->
+<div id="sidebar">
+  <!-- レイヤー -->
+  <div id="panel-view">
+    <h3 class="sidebar-toggle" data-target="layer-content">レイヤー
+      <span id="layer-quick" style="display:none;margin-left:8px;font-size:16px;font-weight:normal;">
+        <span id="lq-cs" title="赤色立体地図" style="cursor:pointer;">🩻</span>
+        <span id="lq-photo" title="航空写真" style="cursor:pointer;">🗾</span>
+        <span id="lq-base" title="ベースマップ" style="cursor:pointer;">🗺️</span>
+        <span id="lq-exag" title="立体化" style="cursor:pointer;">⛰️</span>
+      </span>
+    </h3>
+    <div id="layer-content">
+    <div class="layer-item">
+      <input type="checkbox" id="cb-cs">
+      <label for="cb-cs">🩻 赤色立体地図</label>
+      <input type="range" id="op-cs" min="0" max="100" value="70">
+    </div>
+    <div class="layer-item">
+      <input type="checkbox" id="cb-photo" checked>
+      <label for="cb-photo">🗾 航空写真</label>
+      <input type="range" id="op-photo" min="0" max="100" value="100">
+    </div>
+    <div class="layer-item">
+      <input type="checkbox" id="cb-base" checked>
+      <label for="cb-base">🗺️ ベースマップ</label>
+      <input type="range" id="op-base" min="0" max="100" value="100">
+    </div>
+    <div class="layer-item">
+      <input type="checkbox" id="cb-exag" checked>
+      <label for="cb-exag">⛰️ 立体化</label>
+      <input type="range" id="exag" min="0" max="2" step="0.1" value="1">
+    </div>
+    </div>
+  </div>
+
+  <!-- 認証後コンテンツ（JSで動的生成） -->
+  <div id="auth-content-slot"></div>
+</div>
+
+<!-- Map -->
+<div id="map"></div>
+<!-- 選択中のお気に入り詳細パネル -->
+<div id="detail-panel" style="display:none;">
+  <div class="detail-header">
+    <span id="detail-title"></span>
+    <span id="detail-close" style="cursor:pointer;color:#888;">✕</span>
+  </div>
+  <div id="detail-labels"></div>
+  <div id="detail-quick-labels" style="margin-top:6px;"></div>
+  <div id="detail-comment"></div>
+  <div id="detail-coords" style="font-size:11px;color:#666;margin-top:4px;"></div>
+  <div id="detail-actions" style="margin-top:8px;display:flex;gap:6px;justify-content:flex-end;"></div>
+</div>
+
+<!-- 認証後コンテンツ（JSで動的生成） -->
+<div id="gallery-slot"></div>
+
+<!-- Map Capture Dialog -->
+<div id="capture-overlay" style="display:none;">
+  <div id="capture-dialog">
+    <div id="capture-url-bar"><span id="capture-url"></span><span id="capture-url-icon">📋</span></div>
+    <div id="capture-img-wrap">
+      <canvas id="capture-canvas"></canvas>
+      <div id="capture-img-actions">
+        <button class="btn btn-sm btn-outline" id="capture-copy" title="画像をコピー">📋</button>
+        <button class="btn btn-sm btn-outline" id="capture-dl" title="画像を保存">💾</button>
+        <button class="btn btn-sm btn-outline" id="capture-close" title="閉じる">✕</button>
+      </div>
+    </div>
+    <div id="capture-buttons">
+      <button class="btn btn-sm" id="capture-x">画像をクリップボードにコピーしてエックスの投稿画面を開く</button>
+    </div>
+  </div>
+</div>
+<!-- Selection box drawn on map -->
+<div id="capture-selection" style="display:none;"></div>
+
+
+<!-- Gallery (Review mode) -->
+<div id="gallery">
+  <div id="gallery-header">
+    <h3>検出ギャラリー (<span id="gallery-count">0</span>件)</h3>
+    <button class="btn btn-sm btn-outline" id="btn-gallery-close">閉じる</button>
+  </div>
+  <div id="gallery-grid"></div>
+</div>
+
+<!-- 認証後コンテンツ（JSで動的生成） -->
+<div id="detection-modal-slot"></div>
+
+<!-- 認証後コンテンツ（JSで動的生成） -->
+<div id="account-modal-slot"></div>
+
+</div><!-- /app-root -->
+<script type="module" src="/app.js?v=413"></script>
+</body>
+</html>

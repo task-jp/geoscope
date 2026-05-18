@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>GeoScope — DEM 標高データから地形特徴を AI で発見</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="赤色立体地図 + YOLO で、あなたが教えた地形を全国スキャン。古墳でも城跡でも自然地形でも、サンプルを与えるだけで AI が学習・検出します。">
+<meta property="og:title" content="GeoScope">
+<meta property="og:description" content="赤色立体地図 + YOLO で、あなたが定義した任意の地形を全国 AI 自動検出。BYO クラウドGPU 対応。">
+<meta property="og:type" content="website">
+<meta property="og:image" content="/favicon-512.png">
+<meta name="twitter:card" content="summary">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif;
+    background: #0a0e1a;
+    color: #e0e0e0;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+  a { color: #6bcfff; }
+  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+  /* ヒーロー */
+  .hero {
+    padding: 80px 24px 60px;
+    background: linear-gradient(135deg, #1a0f1f 0%, #0a0e1a 50%, #0f1a2a 100%);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero h1 {
+    font-size: clamp(2.2em, 6vw, 3.8em);
+    margin: 0 0 20px;
+    background: linear-gradient(90deg, #ff6b6b, #6bcfff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+  }
+  .hero .lead {
+    font-size: 1.25em;
+    color: #c0c0c0;
+    max-width: 640px;
+    margin: 0 auto 36px;
+  }
+  .cta-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-size: 1.05em;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.1s, box-shadow 0.2s;
+  }
+  .btn-primary { background: linear-gradient(90deg, #ff6b6b, #ff8c66); color: #fff; }
+  .btn-outline { border-color: #6bcfff; color: #6bcfff; background: transparent; }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255, 107, 107, 0.3); }
+
+  /* セクション */
+  section { padding: 60px 0; }
+  section h2 {
+    font-size: 1.8em;
+    margin: 0 0 32px;
+    text-align: center;
+    color: #fff;
+  }
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+  .feature {
+    background: #131825;
+    border: 1px solid #2a2a4a;
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .feature h3 { margin-top: 0; color: #6bcfff; }
+  .feature p { color: #b0b0b0; font-size: 0.95em; margin-bottom: 0; }
+
+  /* BYO 説明 */
+  .byo-box {
+    background: #0f1a2a;
+    border: 1px solid #2a2a4a;
+    border-radius: 12px;
+    padding: 32px;
+    margin: 24px 0;
+  }
+  .byo-box ol { margin: 0; padding-left: 24px; }
+  .byo-box li { margin: 8px 0; }
+
+  .price-table { width: 100%; border-collapse: collapse; font-size: 0.95em; margin: 20px 0; }
+  .price-table th, .price-table td {
+    border-bottom: 1px solid #2a2a4a;
+    padding: 10px 12px;
+    text-align: left;
+  }
+  .price-table th { color: #6bcfff; }
+
+  /* フッター */
+  footer {
+    margin-top: 60px;
+    padding: 40px 24px;
+    text-align: center;
+    background: #06080f;
+    color: #888;
+    font-size: 0.9em;
+  }
+  footer a { color: #888; margin: 0 12px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="container">
+    <div style="display:inline-block;padding:4px 12px;margin-bottom:12px;background:#ff6b6b22;border:1px solid #ff6b6b66;border-radius:20px;color:#ff9999;font-size:0.85em;">🚧 Alpha リリース — フィードバック歓迎、ベータ・正式版へ向けて改善中</div>
+    <h1>GeoScope</h1>
+    <p class="lead">
+      DEM 標高データと YOLO で、<strong>あなたが教えた地形</strong>を全国スキャン。古墳・城跡から自然地形まで、サンプルを与えるだけで AI が学習・検出します。
+    </p>
+    <div class="cta-row">
+      <a href="/api/auth/google/login" class="btn btn-primary" id="cta-login">Google でログインして使う</a>
+    </div>
+    <p style="font-size: 0.85em; color: #888; margin-top: 24px;">
+      Google アカウントで即サインアップ・無料
+    </p>
+  </div>
+</header>
+
+<section>
+  <div class="container">
+    <h2>できること</h2>
+    <div class="features">
+      <div class="feature">
+        <h3>🩻 赤色立体地図</h3>
+        <p><a href="https://fgd.gsi.go.jp/download/menu.php" target="_blank" rel="noopener">国土地理院の 5m メッシュ DEM</a> を赤色立体地図 (RRIM) としてブラウザ表示。微地形がくっきり見える。</p>
+      </div>
+      <div class="feature">
+        <h3>✏️ アノテーション</h3>
+        <p>地図上で「これは古墳」「これは違う」を ⭕❌ ラベル付け。⭕ サンプルから YOLO を学習させて全国スキャン。</p>
+      </div>
+      <div class="feature">
+        <h3>🤖 YOLO 自動探索</h3>
+        <p>あなたのアノテーションで <a href="https://docs.ultralytics.com/models/yolo26/" target="_blank" rel="noopener">YOLO26n</a> を学習 → 全国 100 万タイルをスキャン。マルチクラス対応で複数テーマを同時実行。</p>
+      </div>
+      <div class="feature">
+        <h3>☁️ BYO クラウドGPU</h3>
+        <p>自分の <a href="https://runpod.io?ref=ok9s0q0q" target="_blank">RunPod</a> アカウントで Pod を起動。運営の GPU 制約なし、自分のペースで何度でも探索。</p>
+      </div>
+      <div class="feature">
+        <h3>🗺️ プロジェクト管理</h3>
+        <p>テーマ別 (古墳・城跡・ダム…) にプロジェクトを分けて、検出結果をフィルタ・ギャラリー表示で精査。</p>
+      </div>
+      <div class="feature">
+        <h3>📤 GeoJSON エクスポート</h3>
+        <p>結果は GeoJSON で出力。QGIS や Google Maps で利用、研究データとして公開も可能。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background: #0f1218;">
+  <div class="container">
+    <h2>BYO クラウドGPU の仕組み</h2>
+    <div class="byo-box">
+      <ol>
+        <li><strong>サインアップ</strong>: Google または LINE で1クリック</li>
+        <li><strong>RunPod アカウント取得</strong>: 招待リンク <a href="https://runpod.io?ref=ok9s0q0q" target="_blank">https://runpod.io?ref=ok9s0q0q</a> から登録 (運営にリワード。非欧州ユーザーは登録ボーナスあり $0〜$10、多くは $5)</li>
+        <li><strong>API key を GeoScope に登録</strong>: アカウント設定モーダルでキーを入力 (ブラウザに保存、サーバーは一時保管→ Job 完了で削除)</li>
+        <li><strong>探索ボタンを押すだけ</strong>: backend が自動で Pod 起動 → DEM 展開 → 学習・スキャン → idle 5 分で Pod stop (DEM はキャッシュされ次回 5秒で再開)</li>
+      </ol>
+    </div>
+
+    <h3 style="margin-top:32px;color:#6bcfff;">想定コスト (RunPod 側、ユーザー負担)</h3>
+    <table class="price-table">
+      <tr><th>項目</th><th>料金</th><th>備考</th></tr>
+      <tr><td>RTX 4090 (Community) Pod</td><td>$0.34/h</td><td>探索中のみ課金。全国スキャン1回 ≈ 6〜8時間 ≈ <strong>約400円</strong></td></tr>
+      <tr><td>Pod stop 中ストレージ (200GB)</td><td>$0.05/GB/月 = $10/月</td><td>DEM キャッシュ保持用 (削除すると次回再 DL)</td></tr>
+      <tr><td>初回 RunPod 登録ボーナス</td><td>$0〜$10 (多くは $5)</td><td>非欧州ユーザー対象。招待リンク <a href="https://runpod.io?ref=ok9s0q0q" target="_blank">https://runpod.io?ref=ok9s0q0q</a> 経由 (運営にリワード)</td></tr>
+    </table>
+    <p style="font-size: 0.85em; color: #888;">
+      ※ 運営側 (geoscope.jp) は Pod の料金を一切徴収しません。RunPod に直接支払う形です。
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="container">
+    <h2>オープンソース</h2>
+    <p style="text-align:center;">
+      ワーカー (GPU 推論コード) は <strong>AGPL-3.0</strong> で公開しています。
+    </p>
+    <div class="cta-row">
+      <a href="https://github.com/task-jp/geoscope-worker" target="_blank" rel="noopener" class="btn btn-outline">geoscope-worker (AGPL-3.0)</a>
+    </div>
+    <p style="text-align:center; color:#888; font-size:0.9em; margin-top:20px;">
+      Docker image: <a href="https://github.com/task-jp/geoscope-worker/pkgs/container/geoscope-worker" target="_blank" rel="noopener"><code>ghcr.io/task-jp/geoscope-worker:latest</code></a>
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div>
+    <a href="/help.html">はじめてガイド</a> ·
+    <a href="/terms.html">利用規約</a> ·
+    <a href="/privacy.html">プライバシーポリシー</a> ·
+    <a href="https://github.com/task-jp/geoscope/issues" target="_blank" rel="noopener">問い合わせ</a>
+  </div>
+  <p style="margin: 16px 0 0;">
+    Powered by: <a href="https://www.gsi.go.jp/" target="_blank" rel="noopener">国土地理院</a> (DEM)、<a href="https://github.com/ultralytics/ultralytics" target="_blank" rel="noopener">ultralytics YOLO</a> (AGPL-3.0)、<a href="https://www.cloudflare.com/products/r2/" target="_blank" rel="noopener">Cloudflare R2</a>
+  </p>
+</footer>
+
+<script>
+  // 既にログイン済みなら SPA に飛ばす
+  if (localStorage.getItem('token')) {
+    location.href = '/';
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+.env
+.worker_key
+models/
+datasets/
+tiles/
+__pycache__/
+*.pyc
+backend/runs/
+backend/*.pt
+backend/yolo*.pt
+*.sql.gz

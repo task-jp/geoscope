@@ -1,0 +1,92 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: geoscope
+      POSTGRES_USER: geoscope
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U geoscope"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  valkey:
+    image: valkey/valkey:8-alpine
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - valkeydata:/data
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 8g
+    environment:
+      DATABASE_URL: postgresql+asyncpg://geoscope:${DB_PASSWORD:-changeme}@db:5432/geoscope
+      VALKEY_URL: redis://valkey:6379/0
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
+      TILES_DIR: /data/tiles
+      MODELS_DIR: /data/models
+      DATASETS_DIR: /data/datasets
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      OAUTH_REDIRECT_BASE: ${OAUTH_REDIRECT_BASE:-}
+      WORKER_API_KEY: ${WORKER_API_KEY:-}
+      # RunPod 連携 (BYO)。ユーザーごとの API key はフロントから
+      # X-RunPod-Api-Key ヘッダで送信される。
+      RUNPOD_IMAGE_NAME: ${RUNPOD_IMAGE_NAME:-}
+      RUNPOD_DATA_CENTER_IDS: ${RUNPOD_DATA_CENTER_IDS:-}
+      RUNPOD_GPU_TYPE_IDS: ${RUNPOD_GPU_TYPE_IDS:-NVIDIA GeForce RTX 4090}
+      RUNPOD_CONTAINER_DISK_GB: ${RUNPOD_CONTAINER_DISK_GB:-50}
+      GEOSCOPE_SERVER: ${GEOSCOPE_SERVER:-}
+      # DEM タイル配布 (Cloudflare R2 等)。Pod に伝搬される。
+      DEM_TILE_BASE_URL: ${DEM_TILE_BASE_URL:-}
+      PREFETCH_PARALLEL: ${PREFETCH_PARALLEL:-256}
+      # Sentry エラー監視 (空なら no-op)
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      SENTRY_ENV: ${SENTRY_ENV:-production}
+    volumes:
+      - ${TILES_DIR:-./tiles}:/data/tiles
+      # 高ズーム (z=16) を別ディスクに分けたい場合は以下のような overlay mount を追加:
+      #   - /mnt/big-disk/z16:/data/tiles/16:ro
+      - ./frontend/public:/app/static:ro
+      - models:/data/models
+      - datasets:/data/datasets
+    depends_on:
+      db:
+        condition: service_healthy
+      valkey:
+        condition: service_started
+    ports:
+      - "127.0.0.1:8000:8000"
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certbot-etc:/etc/letsencrypt:ro
+      - certbot-var:/var/www/certbot:ro
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  valkeydata:
+  models:
+  datasets:
+  certbot-etc:
+  certbot-var:

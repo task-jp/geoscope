@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2d8a4e"/>
+      <stop offset="100%" stop-color="#1a5c32"/>
+    </linearGradient>
+    <linearGradient id="lens" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e8f5e9" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#a5d6a7" stop-opacity="0.15"/>
+    </linearGradient>
+  </defs>
+  <!-- 前方後円墳 = 虫眼鏡: 後円部がレンズ、前方部が持ち手 -->
+  <!-- 全体を45度回転して虫眼鏡らしく -->
+  <g transform="rotate(45 32 32)">
+    <!-- 前方部 = 持ち手 (台形) -->
+    <path d="M 25,42 L 22,60 L 42,60 L 39,42 Z" fill="url(#g)"/>
+    <!-- 後円部 = レンズ枠 -->
+    <circle cx="32" cy="26" r="19" fill="url(#lens)" stroke="url(#g)" stroke-width="5"/>
+    <!-- レンズの光沢 -->
+    <ellipse cx="26" cy="21" rx="7" ry="4.5" fill="white" opacity="0.3" transform="rotate(-20 26 21)"/>
+  </g>
+</svg>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>GeoScope 利用規約</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  body { max-width: 760px; margin: 2em auto; padding: 0 1em; font-family: -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", sans-serif; line-height: 1.7; color: #333; }
+  h1 { border-bottom: 2px solid #2a6; padding-bottom: 0.3em; }
+  h2 { color: #2a6; margin-top: 2em; }
+  p, li { font-size: 14px; }
+  a { color: #2a6; }
+  hr { margin: 3em 0; border: 0; border-top: 1px solid #ddd; }
+  .meta { color: #888; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<h1>GeoScope 利用規約</h1>
+<p class="meta">最終更新: 2026年5月14日</p>
+
+<p>本利用規約 (以下「本規約」) は、GeoScope (https://geoscope.jp 以下「本サービス」) の利用条件を定めるものです。本サービスを利用するすべてのユーザー (以下「利用者」) は、本規約に同意のうえ本サービスを利用するものとします。</p>
+
+<h2>第1条 (サービス概要)</h2>
+<p>本サービスは、DEM (数値標高モデル) 標高データから機械学習を用いて地形特徴 (古墳、城跡、その他の人工地形) を自動検出するための Webサービスです。利用者は自らアノテーションを作成し、自身の RunPod アカウント (以下「BYO クラウドGPU」) を使用して探索ジョブを実行できます。</p>
+
+<h2>第2条 (アカウント)</h2>
+<ol>
+  <li>本サービスは Google の OAuth 認証によるアカウント作成を要件とします。</li>
+  <li>利用者は、自身のアカウント情報を適切に管理する責任を負います。</li>
+  <li>利用者は、本サービスのアカウント設定画面からいつでもアカウントを削除でき、削除によって自身のプロジェクト・アノテーション・ジョブ履歴等のデータは完全に削除されます。</li>
+</ol>
+
+<h2>第3条 (BYO クラウドGPU)</h2>
+<ol>
+  <li>探索ジョブは利用者自身の RunPod アカウントの Pod 上で実行されます。Pod の起動・停止に伴う費用 (GPU 利用料、ストレージ料金、ネットワーク料金等) は全額利用者の負担となります。</li>
+  <li>本サービスは、利用者が入力した RunPod API key をブラウザの localStorage に保存し、探索リクエスト時に HTTP ヘッダ経由でサーバーに一時送信します。サーバー側ではジョブ完了/失敗/キャンセル時に削除し、データベースに永続化しません。</li>
+  <li>利用者は自身の RunPod API key の管理責任を負います。第三者にキーを漏洩させた場合の損害について、本サービスは責任を負いません。</li>
+  <li>RunPod 社のサービス仕様変更・障害・在庫枯渇等により本サービスが利用できない場合があります。</li>
+</ol>
+
+<h2>第4条 (データの帰属とライセンス)</h2>
+<ol>
+  <li>利用者が本サービス上で作成したアノテーション・プロジェクト等のデータは、利用者本人に帰属します。</li>
+  <li>本サービスが利用する地形データは <a href="https://www.gsi.go.jp/" target="_blank" rel="noopener">国土地理院</a> の標高タイル (5mメッシュ) を利用しています。</li>
+  <li>機械学習推論には ultralytics 社の YOLO (AGPL-3.0) を使用しています。ワーカー実装のソースコードは <a href="https://github.com/task-jp/geoscope-worker" target="_blank" rel="noopener">https://github.com/task-jp/geoscope-worker</a> で公開されています。</li>
+</ol>
+
+<h2>第5条 (禁止事項)</h2>
+<p>利用者は以下の行為を行ってはなりません。</p>
+<ul>
+  <li>法令または公序良俗に違反する行為</li>
+  <li>本サービスの運営を妨げる行為 (DDoS、過剰なリクエスト、自動化ツールによる abuse 等)</li>
+  <li>他者の RunPod API key またはアカウントを不正利用する行為</li>
+  <li>本サービスを通じて取得したデータを、提供元 (国土地理院等) の規約に違反する形で利用する行為</li>
+  <li>本サービスのリバースエンジニアリング、脆弱性の探索 (許可された範囲を除く)</li>
+</ul>
+
+<h2>第6条 (検出結果の正確性)</h2>
+<ol>
+  <li>本サービスの機械学習による検出結果は、対象が必ずしも実在することを保証するものではありません。</li>
+  <li>検出結果を学術研究・現地調査・文化財保護等に利用する場合は、利用者自身の責任で別途検証を行ってください。</li>
+</ol>
+
+<h2>第7条 (免責)</h2>
+<ol>
+  <li>本サービスは現状有姿 (as-is) で提供され、特定目的への適合性・正確性・継続性等を保証しません。</li>
+  <li>本サービスの利用または利用不能から生じた一切の損害について、本サービスは責任を負いません。</li>
+  <li>本サービスは事前の予告なく内容を変更・追加・削除する場合があります。</li>
+</ol>
+
+<h2>第8条 (規約の変更)</h2>
+<p>本規約は予告なく変更される場合があります。変更後の規約は本ページ掲載をもって効力を生じ、変更後に本サービスを利用した時点で利用者は変更に同意したものとみなされます。</p>
+
+<h2>第9条 (準拠法・裁判管轄)</h2>
+<p>本規約は日本法に準拠し、本サービスに関する紛争は東京地方裁判所を第一審の専属的合意管轄裁判所とします。</p>
+
+<hr>
+<p class="meta">お問い合わせ: <a href="https://github.com/task-jp/geoscope/issues" target="_blank" rel="noopener">GitHub Issues</a></p>
+
+</body>
+</html>

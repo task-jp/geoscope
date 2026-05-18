@@ -1,0 +1,51 @@
+GeoScope
+Copyright (C) 2026  task-jp
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+------------------------------------------------------------------------
+
+Third-party materials bundled in this repository
+------------------------------------------------
+
+1. db/prefectures.geojson
+   Source: 国土数値情報「行政区域データ」 (国土交通省)
+           https://nlftp.mlit.go.jp/ksj/
+   License: 国土数値情報利用約款 (再配布可)
+
+------------------------------------------------------------------------
+
+Third-party services / data referenced (NOT bundled)
+----------------------------------------------------
+
+1. DEM tiles
+   Source: 国土地理院 基盤地図情報
+           https://fgd.gsi.go.jp/download/menu.php
+   License: 国土地理院コンテンツ利用規約
+            (個別ダウンロード・利用申請の上で生成)
+
+2. YOLO (ultralytics)
+   Source: https://github.com/ultralytics/ultralytics
+   License: AGPL-3.0
+   Note:    本リポジトリには ultralytics 依存はありません。学習・推論は
+            別リポジトリ task-jp/geoscope-worker (AGPL-3.0) で実行されます。
+
+3. MapLibre GL JS
+   Source: https://github.com/maplibre/maplibre-gl-js
+   License: BSD-3-Clause (CDN 経由でロード)
+
+4. 赤色立体地図 (RRIM) 方式
+   Author: 千葉達朗 (アジア航測株式会社)
+   Note:   表現方式自体のアイデア・呼称への謝辞。実装は本リポジトリで
+           独自に行っており、アジア航測社のソースコード等は使用していません。
