@@ -2444,7 +2444,7 @@ function saveFilters() {
 }
 function loadFilters() {
   S.filterConfig = JSON.parse(localStorage.getItem(_filterKey()) || '{"sets":[{"rows":[]}],"spatials":[]}');
-  if (!S.filterConfig.sets) S.filterConfig = { sets: [{ rows: [] }], spatials: [] };
+  if (!S.filterConfig.sets || S.filterConfig.sets.length === 0) S.filterConfig = { sets: [{ rows: [] }], spatials: [] };
 }
 
 // ── Label colors ──
@@ -2936,16 +2936,18 @@ function updateLabelFilter() {
         if (!set.enabled) { eyeBtn.style.opacity = '0.2'; eyeBtn.style.pointerEvents = 'none'; }
         else { eyeBtn.onclick = () => { set.visible = !set.visible; render(); }; }
         btnCol.appendChild(eyeBtn);
-        const delSetBtn = document.createElement('button');
-        delSetBtn.className = 'eye-toggle';
-        delSetBtn.innerHTML = '<span class="eye-icon" style="font-size:10px;">\ud83d\uddd1\ufe0f</span>';
-        delSetBtn.title = '\u3053\u306e\u30bb\u30c3\u30c8\u3092\u524a\u9664';
-        delSetBtn.onclick = () => {
-          S.filterConfig.sets.splice(si, 1);
-          if (si > 0) S.filterConfig.spatials.splice(si - 1, 1);
-          else if (S.filterConfig.spatials.length) S.filterConfig.spatials.splice(0, 1);
-          render();        };
-        btnCol.appendChild(delSetBtn);
+        if (S.filterConfig.sets.length > 1) {
+          const delSetBtn = document.createElement('button');
+          delSetBtn.className = 'eye-toggle';
+          delSetBtn.innerHTML = '<span class="eye-icon" style="font-size:10px;">\ud83d\uddd1\ufe0f</span>';
+          delSetBtn.title = '\u3053\u306e\u30bb\u30c3\u30c8\u3092\u524a\u9664';
+          delSetBtn.onclick = () => {
+            S.filterConfig.sets.splice(si, 1);
+            if (si > 0) S.filterConfig.spatials.splice(si - 1, 1);
+            else if (S.filterConfig.spatials.length) S.filterConfig.spatials.splice(0, 1);
+            render();        };
+          btnCol.appendChild(delSetBtn);
+        }
         setWrap.appendChild(btnCol);
       }
 
@@ -3120,7 +3122,7 @@ function updateLabelFilter() {
     });
 
     const btm = document.createElement('div'); btm.className = 'filter-row';
-    if (S.filterConfig.sets.length < 2 && S.filterConfig.sets[0].rows.length > 0) {
+    if (S.filterConfig.sets.length === 1 && S.filterConfig.sets[0].rows.length > 0) {
       const addS = document.createElement('button'); addS.className = 'filter-add';
       addS.textContent = '+ \u7a7a\u9593\u6bd4\u8f03';
       addS.style.cssText = 'color:#c084fc;border-color:#7c3aed;margin-left:auto;';
