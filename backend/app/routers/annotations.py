@@ -427,30 +427,41 @@ async def import_annotations(
             db.add(AnnotationLabel(annotation_id=annotation.id, label_id=import_label.id))
             inserted += 1
     else:
+        def _f(v, default):
+            """空セル ("" / None) は default。export 由来の空スコア等を許容するため。"""
+            if v is None or v == "":
+                return default
+            return float(v)
+
+        def _i(v, default):
+            if v is None or v == "":
+                return default
+            return int(v)
+
         reader = _csv.DictReader(_io.StringIO(text))
         for row in reader:
-            lat = float(row.get("lat", 0))
-            lon = float(row.get("lon", 0))
+            lat = _f(row.get("lat"), 0.0)
+            lon = _f(row.get("lon"), 0.0)
             label_dicts = _json.loads(row.get("labels", "[]")) if row.get("labels") else []
-            bbox_px_cx = float(row.get("bbox_px_cx", 0.5))
-            bbox_px_cy = float(row.get("bbox_px_cy", 0.5))
-            bbox_px_w = float(row.get("bbox_px_w", 0.1))
-            bbox_px_h = float(row.get("bbox_px_h", 0.1))
+            bbox_px_cx = _f(row.get("bbox_px_cx"), 0.5)
+            bbox_px_cy = _f(row.get("bbox_px_cy"), 0.5)
+            bbox_px_w = _f(row.get("bbox_px_w"), 0.1)
+            bbox_px_h = _f(row.get("bbox_px_h"), 0.1)
             # ピクセル値(>1)なら正規化(0-1)に変換
             if bbox_px_cx > 1: bbox_px_cx /= 512
             if bbox_px_cy > 1: bbox_px_cy /= 512
             if bbox_px_w > 1: bbox_px_w /= 512
             if bbox_px_h > 1: bbox_px_h /= 512
-            tile_x = int(row.get("tile_x", 0))
-            tile_y = int(row.get("tile_y", 0))
-            tile_z = int(row.get("tile_z", 16))
+            tile_x = _i(row.get("tile_x"), 0)
+            tile_y = _i(row.get("tile_y"), 0)
+            tile_z = _i(row.get("tile_z"), 16)
             annotation = Annotation(
                 project_id=project_id, lat=lat, lon=lon,
                 bbox_px_cx=bbox_px_cx, bbox_px_cy=bbox_px_cy,
                 bbox_px_w=bbox_px_w, bbox_px_h=bbox_px_h,
                 tile_x=tile_x, tile_y=tile_y, tile_z=tile_z,
                 title=row.get("title") or None, comment=row.get("comment") or None,
-                score=float(row.get("score", inserted)),
+                score=_f(row.get("score"), float(inserted)),
                 geom=func.ST_SetSRID(func.ST_MakePoint(lon, lat), 4326),
                 bbox_geom=_compute_bbox_geom_expr(tile_x, tile_y, tile_z, bbox_px_cx, bbox_px_cy, bbox_px_w, bbox_px_h),
             )
