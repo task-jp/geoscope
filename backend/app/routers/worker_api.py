@@ -7,13 +7,14 @@ endpoints to fetch jobs, report progress, and upload detection results.
 import asyncio
 import json
 import math
+import re
 from datetime import datetime, timezone
 from uuid import UUID
 
 import redis.asyncio as aioredis
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
@@ -777,6 +778,65 @@ async def download_model(
     if not model_path.exists():
         raise HTTPException(status_code=404, detail="Model not found")
     return FileResponse(str(model_path), filename="best.pt")
+
+
+# ---------------------------------------------------------------------------
+# Multi-class model cache (keyed by combined_hash)
+# ---------------------------------------------------------------------------
+
+_MULTI_HASH_RE = re.compile(r"^[0-9a-f]{8,64}$")
+
+
+def _multi_model_dir(combined_hash: str) -> Path:
+    """Validate combined_hash (hex only, prevent path traversal) and return storage dir."""
+    if not _MULTI_HASH_RE.match(combined_hash):
+        raise HTTPException(status_code=400, detail="Invalid combined_hash")
+    return Path(settings.models_dir) / "multi" / combined_hash
+
+
+@router.post("/models/multi/{combined_hash}/upload")
+async def upload_multi_model(
+    combined_hash: str,
+    file: UploadFile,
+    meta: str | None = Form(None),
+    _auth: WorkerAuth = Depends(verify_worker_key),
+):
+    """Upload a multi-class trained model + optional meta.json keyed by combined_hash."""
+    model_dir = _multi_model_dir(combined_hash)
+    model_dir.mkdir(parents=True, exist_ok=True)
+    content = await file.read()
+    (model_dir / "best.pt").write_bytes(content)
+    if meta is not None:
+        try:
+            json.loads(meta)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="meta must be valid JSON")
+        (model_dir / "meta.json").write_text(meta)
+    return {"hash": combined_hash, "size": len(content)}
+
+
+@router.get("/models/multi/{combined_hash}/download")
+async def download_multi_model(
+    combined_hash: str,
+    _auth: WorkerAuth = Depends(verify_worker_key),
+):
+    """Download a multi-class model file (.pt) by combined_hash."""
+    model_path = _multi_model_dir(combined_hash) / "best.pt"
+    if not model_path.exists():
+        raise HTTPException(status_code=404, detail="Multi model not found")
+    return FileResponse(str(model_path), filename="best.pt")
+
+
+@router.get("/models/multi/{combined_hash}/meta")
+async def get_multi_model_meta(
+    combined_hash: str,
+    _auth: WorkerAuth = Depends(verify_worker_key),
+):
+    """Return the meta.json for a multi-class model (class_map, project_hashes)."""
+    meta_path = _multi_model_dir(combined_hash) / "meta.json"
+    if not meta_path.exists():
+        raise HTTPException(status_code=404, detail="Multi meta not found")
+    return FileResponse(str(meta_path), media_type="application/json")
 
 
 class DedupBody(BaseModel):
