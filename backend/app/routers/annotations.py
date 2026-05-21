@@ -410,6 +410,9 @@ async def import_annotations(
             else:
                 label_dicts = raw_labels
 
+            vote = props.get("annotation_vote", "yes")
+            if vote not in ("yes", "no"):
+                vote = None
             annotation = Annotation(
                 project_id=project_id, lat=lat, lon=lon,
                 bbox_px_cx=bbox_px_cx, bbox_px_cy=bbox_px_cy,
@@ -418,6 +421,7 @@ async def import_annotations(
                 title=props.get("name") or props.get("title"),
                 comment=props.get("comment"),
                 score=props.get("score", 0),
+                annotation_vote=vote,
                 geom=func.ST_SetSRID(func.ST_MakePoint(lon, lat), 4326),
                 bbox_geom=_compute_bbox_geom_expr(tile_x, tile_y, z, bbox_px_cx, bbox_px_cy, bbox_px_w, bbox_px_h),
             )
@@ -455,6 +459,9 @@ async def import_annotations(
             tile_x = _i(row.get("tile_x"), 0)
             tile_y = _i(row.get("tile_y"), 0)
             tile_z = _i(row.get("tile_z"), 16)
+            vote = row.get("annotation_vote") or "yes"
+            if vote not in ("yes", "no"):
+                vote = None
             annotation = Annotation(
                 project_id=project_id, lat=lat, lon=lon,
                 bbox_px_cx=bbox_px_cx, bbox_px_cy=bbox_px_cy,
@@ -462,6 +469,7 @@ async def import_annotations(
                 tile_x=tile_x, tile_y=tile_y, tile_z=tile_z,
                 title=row.get("title") or None, comment=row.get("comment") or None,
                 score=_f(row.get("score"), float(inserted)),
+                annotation_vote=vote,
                 geom=func.ST_SetSRID(func.ST_MakePoint(lon, lat), 4326),
                 bbox_geom=_compute_bbox_geom_expr(tile_x, tile_y, tile_z, bbox_px_cx, bbox_px_cy, bbox_px_w, bbox_px_h),
             )
